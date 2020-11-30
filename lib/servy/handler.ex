@@ -10,6 +10,8 @@ defmodule Servy.Handler do
 			500 => "Internal Server Error"
 	}
 
+	@pages_path Path.expand("../../pages", __DIR__)
+
 	def handle(request) do
 		request 
 			|> parse
@@ -42,6 +44,10 @@ defmodule Servy.Handler do
 		%{conv | path: "/wildthings"}
 	end
 
+	def rewrite_path(%{path: "/bears/new"} = conv) do
+		%{conv | path: "/pages/bears/form"}
+	end
+
 	def rewrite_path(conv), do: conv
 
 	# def route(conv) do
@@ -60,8 +66,8 @@ defmodule Servy.Handler do
 		%{conv | status: 200, resp_body: "Bear ID - #{id}"}
 	end
 
-	def route(%{method: "GET", path: "/content/" <> file_name} = conv) do
-		Path.expand("../../pages", __DIR__)
+	def route(%{method: "GET", path: "/pages/" <> file_name} = conv) do
+		@pages_path
 		|> Path.join(file_name <> ".html")
 		|> log("File")
 		|> File.read
@@ -131,7 +137,7 @@ IO.puts Servy.Handler.handle(request)
 
 
 request = """
-GET /content/about HTTP/1.1
+GET /pages/about HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
@@ -141,7 +147,16 @@ IO.puts Servy.Handler.handle(request)
 
 
 request = """
-GET /content/contact HTTP/1.1
+GET /pages/contact HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
+IO.puts Servy.Handler.handle(request)
+
+request = """
+GET /bears/new HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
