@@ -61,7 +61,7 @@ defmodule Servy.Handler do
 	end
 
 	def route(%{method: "GET", path: "/content/" <> file_name} = conv) do
-		Path.expand("../../", __DIR__)
+		Path.expand("../../pages", __DIR__)
 		|> Path.join(file_name <> ".html")
 		|> log("File")
 		|> File.read
