@@ -1,6 +1,10 @@
 require Logger
 
 defmodule Servy.Handler do
+	@moduledoc """
+	A HTTP Request handler.
+	"""
+
 
 	@http_codes %{
 			200 => "OK",
@@ -12,6 +16,10 @@ defmodule Servy.Handler do
 
 	@pages_path Path.expand("../../pages", __DIR__)
 
+	@doc """
+	The entry point function that transforms the request
+	into a response
+	"""
 	def handle(request) do
 		request 
 			|> parse
