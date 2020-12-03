@@ -1,10 +1,12 @@
-require Logger
 
 defmodule Servy.Handler do
 	@moduledoc """
 	A HTTP Request handler.
 	"""
 
+	import Servy.Plugins, only: [rewrite_path: 1, log: 1, log: 2]
+	import Servy.Parser, only: [parse: 1]
+	import Servy.FileHandler, only: [handle_file: 2]
 
 	@http_codes %{
 			200 => "OK",
@@ -14,7 +16,7 @@ defmodule Servy.Handler do
 			500 => "Internal Server Error"
 	}
 
-	@pages_path Path.expand("../../pages", __DIR__)
+	@pages_path Path.expand("pages", File.cwd!)
 
 	@doc """
 	The entry point function that transforms the request
@@ -29,34 +31,6 @@ defmodule Servy.Handler do
 			|> format_response
 	end
 
-	def log(conv, message \\ "") do
-		case message do
-			"" -> Logger.info conv
-			_ -> Logger.info [message: message, value: conv]
-				
-		end
-	 conv
-	end
-
-	def parse(request) do
-		[method, path, _version] 
-				= request 
-						|> String.split("\n")
-						|> List.first()
-						|> String.split(" ")
-
-		%{method: method, path: path, status: nil, resp_body: ""}
-	end
-
-	def rewrite_path(%{path: "/wildlife"} = conv) do
-		%{conv | path: "/wildthings"}
-	end
-
-	def rewrite_path(%{path: "/bears/new"} = conv) do
-		%{conv | path: "/pages/bears/form"}
-	end
-
-	def rewrite_path(conv), do: conv
 
 	# def route(conv) do
 	# 	route(conv, conv.method, conv.path)
@@ -85,19 +59,6 @@ defmodule Servy.Handler do
 	def route(conv) do
 		%{conv | status: 404, resp_body: "No #{conv.path} here"}
 	end
-
-	defp handle_file({ :ok, contents }, conv) do
-		%{conv | status: 200, resp_body: contents}
-	end
-
-	defp handle_file({ :error, :enoent }, conv) do
-		%{conv | status: 404, resp_body: "File not found"}
-	end
-
-	defp handle_file({ :error, reason }, conv) do
-		%{conv | status: 500, resp_body: reason}
-	end
-
 
 	def format_response(conv) do
 		"""
