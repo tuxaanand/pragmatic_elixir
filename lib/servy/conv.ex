@@ -11,7 +11,13 @@ defmodule Servy.Conv do
 			500 => "Internal Server Error"
 	}
 
-	defstruct method: "", path: "", status: nil, resp_body: ""	
+	defstruct [
+		method: "", 
+		path: "", 
+		params: %{},
+		status: nil, 
+		resp_body: ""	
+	]
 
 	def full_status(%Conv{} = conv) do
 		"#{conv.status} #{status_text(conv.status)}"
