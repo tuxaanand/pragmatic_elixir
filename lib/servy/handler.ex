@@ -40,11 +40,16 @@ defmodule Servy.Handler do
 	end
 
 	def route(%Conv{method: "GET", path: "/bears/" <> id} = conv) do
-		BearController.show(conv, id)
+		params = Map.put(conv.params, "id", id)
+		BearController.show(conv, params)
 	end
 
 	def route(%Conv{method: "POST", path: "/bears"} = conv) do
 		BearController.create(conv, conv.params)
+	end
+
+	def route(%Conv{method: "DELETE", path: "/bears" <> _id} = conv) do
+		BearController.delete(conv, conv.params)
 	end
 
 	def route(%Conv{method: "GET", path: "/pages/" <> file_name} = conv) do
@@ -145,3 +150,13 @@ name=Baloo&type=Brown
 response = Servy.Handler.handle(request)
 
 IO.puts response
+
+
+request = """
+DELETE /bears/1 HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
+IO.puts Servy.Handler.handle(request)

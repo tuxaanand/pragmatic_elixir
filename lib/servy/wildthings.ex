@@ -2,7 +2,7 @@ defmodule Servy.Wildthings do
 
 	alias Servy.Bear
 
-	defp list_bears do
+	def list_bears do
 	  [
 	    %Bear{id: 1, name: "Teddy", type: "Brown", hibernating: true},
 	    %Bear{id: 2, name: "Smokey", type: "Black"},
@@ -15,6 +15,15 @@ defmodule Servy.Wildthings do
 	    %Bear{id: 9, name: "Iceman", type: "Polar", hibernating: true},
 	    %Bear{id: 10, name: "Kenai", type: "Grizzly"}
 	  ]
+	end
+
+	def get_bear(id) when is_integer(id) do
+		list_bears()
+			|> Enum.find(fn(b) -> b.id == id end)
+	end
+
+	def get_bear(id) when is_binary(id) do
+		get_bear(String.to_integer(id))
 	end
 	
 end
